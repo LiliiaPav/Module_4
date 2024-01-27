@@ -1,5 +1,5 @@
 import React from 'react'
-import { Badge, Button, Table, Card } from 'react-bootstrap' 
+import { Badge, Button, Table, Card, Modal } from 'react-bootstrap' 
 import {useLocation, Link} from 'react-router-dom'
 import EmployeeFilter from './EmployeeFilter.jsx'
 import EmployeeAdd from './EmployeeAdd.jsx'
@@ -47,23 +47,66 @@ function EmployeeTable (props){
     )
 }
 
-function EmployeeRow (props){
-    function onDeleteClick(){
-        props.deleteEmployee(props.employee._id)
+class EmployeeRow extends React.Component{
+    constructor() {
+        super()
+        this.state = {
+            modalVisible: false,
+        }
+        this.handleSubmit = this.handleSubmit.bind(this)
+        this.handleShowModal = this.handleShowModal.bind(this)
+        this.handleHideModal = this.handleHideModal.bind(this)
     }
 
+    handleShowModal() {
+        this.setState({ modalVisible: true, })
+    }
+
+    handleHideModal() {
+        this.setState({ modalVisible: false, })
+    }
+
+    handleSubmit(e) {
+        this.props.deleteEmployee(this.props.employee._id)
+    }
+    render() {
         return(
             <tr>
-                <td><Link to={`/edit/${props.employee._id}`}>{props.employee.name}</Link></td>
-                <td>{props.employee.extension}</td>
-                <td>{props.employee.email}</td>
-                <td>{props.employee.title}</td>
-                <td>{props.employee.dateHired.toDateString()}</td>
-                <td>{props.employee.currentlyEmployed ? 'Yes' : 'No'}</td>
-                <td><Button variant = "danger" size='sm' onClick={onDeleteClick}>X</Button></td>
+                <td><Link to={`/edit/${this.props.employee._id}`}>{this.props.employee.name}</Link></td>
+                <td>{this.props.employee.extension}</td>
+                <td>{this.props.employee.email}</td>
+                <td>{this.props.employee.title}</td>
+                <td>{this.props.employee.dateHired.toDateString()}</td>
+                <td>{this.props.employee.currentlyEmployed ? 'Yes' : 'No'}</td>
+                <td><Button variant = "danger" size='sm' onClick={this.handleShowModal}>X</Button>
+                <Modal show={this.state.modalVisible} onHide={this.handleHideModal} centered>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Delete Employee</Modal.Title>
+                    </Modal.Header>
+
+                    <Modal.Body>
+                        Are you sure you want to delete this employee?
+                    </Modal.Body>
+
+                    <Modal.Footer>
+                    <Button variant="danger" size="sm" onClick={this.handleHideModal}>
+                        Cansel
+                    </Button>
+                        <Button 
+                            type="submit" 
+                            variant="success" 
+                            size="sm" 
+                            onClick={this.handleSubmit}>
+                                Yes
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
+                
+                
+                </td>
             </tr>
         )
-}
+}}
 
 export default class EmployeeList extends React.Component{
 
@@ -103,7 +146,6 @@ export default class EmployeeList extends React.Component{
             newEmployee.employee.dateHired = new Date(newEmployee.employee.dateHired)
             const newEmployees = this.state.employees.concat(newEmployee.employee)
             this.setState({employees: newEmployees})
-            console.log("Total count of employees:", newEmployees.length)
         })
         .catch (err => {console.log(err)})
     }
