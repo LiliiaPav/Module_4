@@ -1,34 +1,50 @@
 import React from 'react'
+import { Badge, Button, Table, Card } from 'react-bootstrap' 
+import {useLocation, Link} from 'react-router-dom'
 import EmployeeFilter from './EmployeeFilter.jsx'
 import EmployeeAdd from './EmployeeAdd.jsx'
 
 function EmployeeTable (props){
-        const employeeRows= props.employees.map(employee => 
-            <EmployeeRow 
-                key={employee._id} 
-                employee={employee}
-                deleteEmployee={props.deleteEmployee} 
-                
-                />)
-        return (
-            <table className="table-bordered">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Extention</th>
-                        <th>Email</th>
-                        <th>Title</th>
-                        <th>Date Hired</th>
-                        <th>Currently Employed?</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {employeeRows}
-                    
-                </tbody>
-            </table>
-        )
+    //GET THE URL
+    const { search } = useLocation()
+    //GET THE PARAMETERS FROM THE URL
+    const query = new URLSearchParams(search)
+    //GET THE EMPLOYED PARAMETER SPECIFICALLY
+    const q = query.get('employed')
+
+    const employeeRows= props.employees
+    .filter(employee => (q ? String(employee.currentlyEmployed)=== q : true))
+    .map(employee => 
+        <EmployeeRow 
+            key={employee._id} 
+            employee={employee}
+            deleteEmployee={props.deleteEmployee} 
+            />)
+    return (
+        <Card>
+            <Card.Header as="h5">All Employees&nbsp;<Badge bg="secondary">{employeeRows.length}</Badge></Card.Header>
+            <Card.Body>
+                <Card.Text>
+        <Table striped size="sm" >
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Extention</th>
+                    <th>Email</th>
+                    <th>Title</th>
+                    <th>Date Hired</th>
+                    <th>Currently Employed?</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {employeeRows}
+            </tbody>
+        </Table>
+        </Card.Text>
+        </Card.Body>
+        </Card>
+    )
 }
 
 function EmployeeRow (props){
@@ -38,13 +54,13 @@ function EmployeeRow (props){
 
         return(
             <tr>
-                <td>{props.employee.name}</td>
+                <td><Link to={`/edit/${props.employee._id}`}>{props.employee.name}</Link></td>
                 <td>{props.employee.extension}</td>
                 <td>{props.employee.email}</td>
                 <td>{props.employee.title}</td>
                 <td>{props.employee.dateHired.toDateString()}</td>
                 <td>{props.employee.currentlyEmployed ? 'Yes' : 'No'}</td>
-                <td><button onClick={onDeleteClick}>DELETE</button></td>
+                <td><Button variant = "danger" size='sm' onClick={onDeleteClick}>X</Button></td>
             </tr>
         )
 }
@@ -66,10 +82,9 @@ export default class EmployeeList extends React.Component{
 		fetch('/api/employees')
 			.then(response => response.json())
 			.then(data => {
-				console.log('Total count of records:', data.count)
 				data.employees.forEach(employee => {
 					employee.dateHired = new Date(employee.dateHired)
-					employee.currentlyEmployed = employee.currentlyEmployed ? 'Yes' : 'No'
+					// employee.currentlyEmployed = employee.currentlyEmployed ? 'Yes' : 'No'
 				})
 				this.setState({ employees: data.employees })
 			})
@@ -107,12 +122,10 @@ export default class EmployeeList extends React.Component{
     render(){
         return (
         <React.Fragment>
-            <h1>Employee Management Aplication</h1>
-            <EmployeeFilter />
-            <hr />
-            <EmployeeTable employees={this.state.employees} deleteEmployee={this.deleteEmployee}/>
-            <hr />
             <EmployeeAdd createEmployee={this.createEmployee.bind(this)}/>
+            <EmployeeFilter />
+            <EmployeeTable employees={this.state.employees} deleteEmployee={this.deleteEmployee}/>
+            
         </React.Fragment>
         )
     }

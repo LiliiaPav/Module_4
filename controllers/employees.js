@@ -30,7 +30,7 @@ const updateEmployee = async (req, res) =>{
         if (!employee){
             return res.status(404).json({msg: `No employee with ID ${employeeID} found`})
         }
-        res.status(200).json({msg: 'Updated'})
+        res.status(200).json({msg: 'Successfully Updated'})
     } catch (error) {
         res.status(500).json({msg:error})
     }

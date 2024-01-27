@@ -3,6 +3,7 @@ import {} from 'dotenv/config';
 import routes from './routes/routes.js'
 import connectDB from './db/connect.js'
 import bodyParser from 'body-parser';
+import path from 'path'
 
 const app=express();
 
@@ -14,6 +15,12 @@ app.use(bodyParser.json())
 
 //load routes into our main file
 app.use('/', routes);
+
+app.get('*', (req, res) => {
+    res.sendFile (path.resolve('public/index.html'))
+})
+
+
 const PORT = process.env.PORT || 8000;
 
 const init = async () =>{

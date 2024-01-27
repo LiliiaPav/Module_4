@@ -26,8 +26,11 @@
   "dependencies": {
     "@babel/preset-react": "^7.23.3",
     "body-parser": "^1.20.2",
+    "bootstrap": "^5.3.2",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
-    "mongoose": "^8.0.4"
+    "mongoose": "^8.0.4",
+    "react-bootstrap": "^2.10.0",
+    "react-router-dom": "^6.21.3"
   }
 }
